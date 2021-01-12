@@ -84,9 +84,12 @@ services:
     ports: 
     - '8080:8080' # Should be removed once you setup nginx. It is for testing the compose file only.
     volumes:
-    - ~/code-server/local:/home/coder/.local
+    - ~/code-server/.config:/home/coder/.config
+    - ~/code-server/.local:/home/coder/.local
     - ${PWD}:/home/coder/project
+    user: ${CURRENT_UID} # Please run as follows CURRENT_UID=$(id -u):$(id -g) docker-compose up
     command: ['--auth', 'none']
+  # Mongo DB Client
   mongoclient:
       image: mongoclient/mongoclient
       container_name: strapi-mongoclient
