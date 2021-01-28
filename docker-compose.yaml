@@ -44,6 +44,22 @@ services:
     depends_on:
       - mongo
 
+  # Frontend
+  frontend:
+    build:
+        context: ./frontend
+        dockerfile: Dockerfile
+    image: frontend:local
+    container_name: strapi-frontend
+    environment:
+      - API_BASEURL=http://localhost:1337
+    volumes:
+      - ./frontend:/usr/src/app
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
   # Database
   mongo:
     image: mongo
@@ -62,33 +78,6 @@ services:
       - '27017:27017'
     restart: unless-stopped
 
-  # Frontend
-  frontend:
-    build:
-        context: ./frontend
-        dockerfile: Dockerfile
-    image: frontend:local
-    container_name: strapi-frontend
-    environment:
-      - API_BASEURL=http://localhost:1337
-    volumes:
-      - ./frontend:/usr/src/app
-    ports:
-      - '3000:3000'
-    depends_on:
-      - backend
-
-  # Coder
-  code-server:
-    image: codercom/code-server
-    ports: 
-    - '8080:8080' # Should be removed once you setup nginx. It is for testing the compose file only.
-    volumes:
-    - code-server/.config:/home/coder/.config
-    - code-server/.local:/home/coder/.local
-    - ${PWD}:/home/coder/project
-    user: ${CURRENT_UID} # Please run as follows CURRENT_UID=$(id -u):$(id -g) docker-compose up
-    command: ['--auth', 'none']
   # Mongo DB Client
   mongoclient:
       image: mongoclient/mongoclient
@@ -101,6 +90,46 @@ services:
         - strapi-network
       depends_on:
         - mongodb
+  
+  # Coder
+  code-server:
+    image: codercom/code-server
+    ports: 
+    - '8081:8080' # Should be removed once you setup nginx. It is for testing the compose file only.
+    volumes:
+    - code-server/.config:/home/coder/.config
+    - code-server/.local:/home/coder/.local
+    - ${PWD}:/home/coder/project
+    user: ${CURRENT_UID} # Please run as follows CURRENT_UID=$(id -u):$(id -g) docker-compose up
+    command: ['--auth', 'none']
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    networks:
+      - strapi-network
+    volumes: # 💡
+      - ./webserver/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./webserver/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    ports:
+      - 80:80
+    restart: unless-stopped
+    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'" # 💡
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    networks:
+      - strapi-network
+    volumes:
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
+    restart: unless-stopped
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;" # 💡
+    depends_on:
+      - nginx
 
 networks:
   strapi-network:
