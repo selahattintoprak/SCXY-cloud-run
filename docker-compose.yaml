@@ -56,7 +56,7 @@ services:
     volumes:
       - ./frontend:/usr/src/app
     ports:
-      - '3000:3000'
+      - '3100:3000'
     depends_on:
       - backend
 
@@ -73,7 +73,7 @@ services:
       - strapi-network
     volumes:
         - ./db:/data/db
-        - strapi-data:/data/db
+        #- strapi-data:/data/db
     ports:
       - '27017:27017'
     restart: unless-stopped
@@ -89,7 +89,7 @@ services:
       networks:
         - strapi-network
       depends_on:
-        - mongodb
+        - mongo
   
   # Coder
   code-server:
@@ -97,8 +97,8 @@ services:
     ports: 
     - '8081:8080' # Should be removed once you setup nginx. It is for testing the compose file only.
     volumes:
-    - code-server/.config:/home/coder/.config
-    - code-server/.local:/home/coder/.local
+    - ./code-server/.config:/home/coder/.config
+    - ./code-server/.local:/home/coder/.local
     - ${PWD}:/home/coder/project
     user: ${CURRENT_UID} # Please run as follows CURRENT_UID=$(id -u):$(id -g) docker-compose up
     command: ['--auth', 'none']
@@ -117,7 +117,8 @@ services:
       - 80:80
     restart: unless-stopped
     command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'" # 💡
-
+    depends_on:
+      - code-server
   certbot:
     container_name: certbot
     image: certbot/certbot
