@@ -18,5 +18,7 @@ EXPOSE 3000
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
+RUN set -ex; chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # start the app
 ENTRYPOINT ["docker-entrypoint.sh"]
