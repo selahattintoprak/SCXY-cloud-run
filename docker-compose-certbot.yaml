@@ -115,11 +115,13 @@ services:
     networks:
       - strapi_network
     volumes: # 💡
-      - ./webserver/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./webserver/certbot/default.conf:/etc/nginx/conf.d/default.conf
       #- ./webserver/nginx/nginx.conf:/etc/nginx/nginx.conf
-      #- ./webserver/nginx/coder.localhost.conf:/etc/nginx/sites-enabled/coder.localhost.conf # ⚠️
-      - ./webserver/nginx/certs/coder.key:/etc/nginx/certs/coder.key
-      - ./webserver/nginx/certs/coder.crt:/etc/nginx/certs/coder.crt
+      - ./webserver/certbot/coder.localhost.conf:/etc/nginx/sites-enabled/coder.localhost.conf # ⚠️
+      #- ./webserver/nginx/certs/coder.key:/etc/nginx/certs/coder.key
+      #- ./webserver/nginx/certs/coder.crt:/etc/nginx/certs/coder.crt
+      - ./webserver/certbot/conf:/etc/letsencrypt
+      - ./webserver/certbot/www:/var/www/certbot
     ports:
       - 80:80
       - 443:443
@@ -136,7 +138,7 @@ services:
       - ./webserver/certbot/www:/var/www/certbot
     restart: unless-stopped
     entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;" # 💡
-    #command: certonly --webroot --webroot-path=/var/www/certbot --email selo@pwa.marketing --agree-tos --no-eff-email -d dev.pwa.marketing
+    command: certonly --webroot --webroot-path=/var/www/certbot --email selo@pwa.marketing --agree-tos --no-eff-email -d coder.localhost
     depends_on:
       - nginx
 
