@@ -4,15 +4,15 @@
     "default": {
       "connector": "mongoose",
       "settings": {
-        "database": "backend",
+        "database": "strapi",
         "host": "127.0.0.1",
         "srv": false,
         "port": 27017,
-        "username": "",
-        "password": ""
+        "username": "strapi",
+        "password": "strapi"
       },
       "options": {
-        "authenticationDatabase": ""
+        "authenticationDatabase": "strapi"
       }
     }
   }

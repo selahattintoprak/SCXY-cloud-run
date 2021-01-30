@@ -118,29 +118,27 @@ services:
       - ./webserver/certbot/default.conf:/etc/nginx/conf.d/default.conf
       #- ./webserver/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./webserver/certbot/coder.localhost.conf:/etc/nginx/sites-enabled/coder.localhost.conf # ⚠️
-      #- ./webserver/nginx/certs/coder.key:/etc/nginx/certs/coder.key
-      #- ./webserver/nginx/certs/coder.crt:/etc/nginx/certs/coder.crt
-      - ./webserver/certbot/conf:/etc/letsencrypt
-      - ./webserver/certbot/www:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      #- web-root:/var/www/html
     ports:
       - 80:80
       - 443:443
     restart: unless-stopped
-    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'" # 💡
-    user: ${CURRENT_UID}
+    #command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'" # 💡
+    depends_on:
+      - certbot
   certbot:
     container_name: certbot
     image: certbot/certbot
     networks:
       - strapi_network
     volumes:
-      - ./webserver/certbot/conf:/etc/letsencrypt
-      - ./webserver/certbot/www:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
     restart: unless-stopped
-    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;" # 💡
-    command: certonly --webroot --webroot-path=/var/www/certbot --email selo@pwa.marketing --agree-tos --no-eff-email -d coder.localhost
-    depends_on:
-      - nginx
+    #entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;" # 💡
+    command: certonly --standalone --register-unsafely-without-email --agree-tos --no-eff-email --staging -d selo.dev
 
 networks:
   strapi_network:
@@ -148,3 +146,5 @@ networks:
 
 volumes:
   strapi-data:
+  certbot-etc:
+  certbot-var:
