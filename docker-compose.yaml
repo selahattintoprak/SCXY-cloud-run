@@ -88,7 +88,7 @@ services:
     image: mongoclient/mongoclient
     container_name: strapi-mongoclient
     environment:
-      - MONGOCLIENT_DEFAULT_CONNECTION_URL=mongodb://mongo:27017
+      - MONGOCLIENT_DEFAULT_CONNECTION_URL=mongodb://localhost:27017/strapi
     ports:
       - '3300:3000'
     networks:
@@ -145,6 +145,7 @@ services:
 
 networks:
   strapi_network:
+    driver: bridge
     name: strapi_network
 
 volumes:
