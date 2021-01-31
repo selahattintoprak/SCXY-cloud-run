@@ -35,6 +35,7 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      #AUTHENTICATION_DATABASE: ${AUTHENTICATION_DATABASE}
     networks:
       - strapi_network
     volumes:
@@ -51,8 +52,10 @@ services:
         dockerfile: Dockerfile
     image: frontend:local
     container_name: strapi-frontend
+    env_file: .env
     environment:
       - API_BASEURL=http://localhost:1337
+      - NEXT_PUBLIC_API_URL=http://localhost:1337
     networks:
       - strapi_network
     volumes:

@@ -31,6 +31,6 @@ else
     fi
 
     echo "Started Next app..."
-
+fi
 # Execute the rest of your ENTRYPOINT and CMD as expected.
 exec "$@"

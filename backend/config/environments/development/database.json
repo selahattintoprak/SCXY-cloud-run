@@ -5,14 +5,14 @@
       "connector": "mongoose",
       "settings": {
         "database": "strapi",
-        "host": "127.0.0.1",
+        "host": "mongo",
         "srv": false,
         "port": 27017,
         "username": "strapi",
         "password": "strapi"
       },
       "options": {
-        "authenticationDatabase": "strapi"
+        "authenticationDatabase": ""
       }
     }
   }
