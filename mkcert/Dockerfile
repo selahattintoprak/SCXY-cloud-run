@@ -8,7 +8,16 @@ RUN cd /go && \
     go get -u github.com/FiloSottile/mkcert && \
     cd src/github.com/FiloSottile/mkcert && \
     go build -o /bin/mkcert
-#["$(ls -A /root/.local/share/mkcert)"] && echo "Existing Certs Found."; exit; || \
-CMD mkcert -install && for i in $(echo ${DOMAIN_NAME} | sed "s/,/ /g"); \
-    do mkcert $i; mkcert -pkcs12 $i; done && \
-    tail -f -n0 /etc/hosts
+    #If no files exists
+
+# Copy local code to the container image.
+COPY certs/ /tmp/certs
+
+
+COPY docker-entrypoint.sh /usr/local/go/bin/
+
+RUN set -ex; chmod +x /usr/local/go/bin/docker-entrypoint.sh
+
+# start the app
+ENTRYPOINT ["docker-entrypoint.sh"]
+   
