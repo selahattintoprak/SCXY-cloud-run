@@ -119,8 +119,8 @@ services:
       - ./webserver/certbot/selo.dev.conf:/etc/nginx/sites-enabled/selo.dev.conf
       - /etc/letsencrypt:/etc/letsencrypt
     ports:
-      - 0.0.0.0:80:80
-      - 0.0.0.0:443:443
+      - 80:80
+      - 443:443
     restart: unless-stopped
     #entrypoint: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'" # 💡
     user: ${CURRENT_UID}

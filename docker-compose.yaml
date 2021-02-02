@@ -98,6 +98,7 @@ services:
   # Coder
   code-server:
     image: codercom/code-server
+    container_name: strapi-coder
     ports: 
     - '8081:8080' # Should be removed once you setup nginx. It is for testing the compose file only.
     volumes:
@@ -110,8 +111,9 @@ services:
       - strapi_network
   #Nginx
   nginx:
-    container_name: nginx
     image: nginx:latest
+    container_name: strapi-nginx
+    env_file: .env
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
     extra_hosts:
@@ -134,7 +136,8 @@ services:
         context: ./mkcert
         dockerfile: Dockerfile
     image: mkcert:local
-    container_name: mkcert
+    container_name: strapi-mkcert
+    env_file: .env
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
     networks:
