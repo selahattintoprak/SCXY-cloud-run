@@ -1,1 +1,0 @@
-export CURRENT_UID=$(id -u):$(id -g) && bash init-letsencrypt.sh
